@@ -63,7 +63,7 @@ async function displayPhoto(index) {
             if (change > 100) {
                 card.classList.add('keep');
                 card.textContent = 'Kept';
-                updatePhotoGroup(file.name, 'kept', e.target.result);
+                updatePhotoGroup(file.name, 'kept', URL.createObjectURL(file));
                 setTimeout(() => {
                     if (currentCardIndex < files.length - 1) {
                         currentCardIndex++;
@@ -78,7 +78,7 @@ async function displayPhoto(index) {
             } else if (change < -100) {
                 card.classList.add('delete');
                 card.textContent = 'Deleted';
-                updatePhotoGroup(file.name, 'deleted', e.target.result);
+                updatePhotoGroup(file.name, 'deleted', URL.createObjectURL(file));
                 setTimeout(() => {
                     if (currentCardIndex < files.length - 1) {
                         currentCardIndex++;
