@@ -1,0 +1,103 @@
+body {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    font-family: Arial, sans-serif;
+}
+
+#photoContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 80%;
+    height: 70%;
+    margin: 20px 0;
+    border: 2px solid #ccc;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.card {
+    width: 100%;
+    height: 100%;
+    background-color: #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    position: relative;
+    transition: transform 0.3s ease;
+    background-size: contain;
+    /* Ensure the image fits inside the container */
+    background-repeat: no-repeat;
+    /* Prevent the image from repeating */
+}
+
+.card.keep {
+    background-color: green;
+    color: rgb(4, 255, 75);
+    font-size: 36px;
+    /* Increased font size */
+}
+
+.card.delete {
+    background-color: red;
+    color: rgb(241, 7, 7);
+    font-size: 36px;
+    /* Increased font size */
+}
+
+#navigationBar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+}
+
+#navigationBar button {
+    margin: 0 10px;
+}
+
+#endMessage {
+    display: none;
+    font-size: 24px;
+    text-align: center;
+    margin-top: 20px;
+}
+
+#resultsContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+#resultsContainer h2 {
+    margin: 10px 0;
+}
+
+#keptPhotos,
+#deletedPhotos {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 80%;
+}
+
+#keptPhotos img,
+#deletedPhotos img {
+    width: 100px;
+    height: 100px;
+    margin: 5px;
+    object-fit: cover;
+}
+
+#commitChangesButton {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 16px;
+}

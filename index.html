@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Swipe to Keep/Delete</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <button id="folderButton">Select Folder</button>
+    <div id="photoContainer"></div>
+    <div id="navigationBar">
+        <button id="prevButton">&larr;</button>
+        <span id="photoIndex">0/0</span>
+        <button id="nextButton">&rarr;</button>
+    </div>
+    <div id="endMessage">
+        <button id="viewResultsButton">View Results</button>
+    </div>
+    <div id="resultsContainer" style="display: none;">
+        <h2>Kept Photos</h2>
+        <div id="keptPhotos"></div>
+        <h2>Deleted Photos</h2>
+        <div id="deletedPhotos"></div>
+        <button id="commitChangesButton">Commit Changes</button>
+    </div>
+    <script src="script.js"></script>
+</body>
+
+</html>
