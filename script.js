@@ -15,9 +15,36 @@ let files = [];
 let keptPhotos = [];
 let deletedPhotos = [];
 let atEnd = false;
+let directoryHandle;
 
-folderButton.addEventListener('click', () => {
-    fileInput.click();
+function isMobileDevice() {
+    return /Mobi|Android/i.test(navigator.userAgent);
+}
+
+folderButton.addEventListener('click', async () => {
+    if (isMobileDevice()) {
+        fileInput.click();
+    } else {
+        directoryHandle = await window.showDirectoryPicker();
+        files = [];
+
+        for await (const entry of directoryHandle.values()) {
+            if (entry.kind === 'file' && entry.name.match(/\.(jpg|jpeg|png|gif|heic|heif|avif)$/i)) {
+                files.push(entry);
+            }
+        }
+
+        currentCardIndex = 0;
+        keptPhotos = [];
+        deletedPhotos = [];
+        await processFiles();
+        displayPhoto(currentCardIndex);
+        updatePhotoIndex();
+        endMessage.style.display = 'none';
+        resultsContainer.style.display = 'none';
+        photoContainer.style.display = 'flex';
+        atEnd = false;
+    }
 });
 
 fileInput.addEventListener('change', async (event) => {
@@ -36,9 +63,11 @@ fileInput.addEventListener('change', async (event) => {
 
 async function processFiles() {
     for (let i = 0; i < files.length; i++) {
-        if (files[i].type === 'image/heif' || files[i].type === 'image/heic') {
-            const convertedBlob = await heic2any({ blob: files[i], toType: 'image/jpeg' });
-            files[i] = new File([convertedBlob], files[i].name.replace(/\.[^/.]+$/, ".jpg"), { type: 'image/jpeg' });
+        const fileHandle = files[i];
+        const file = fileHandle instanceof File ? fileHandle : await fileHandle.getFile();
+        if (file.type === 'image/heif' || file.type === 'image/heic') {
+            const convertedBlob = await heic2any({ blob: file, toType: 'image/jpeg' });
+            files[i] = new File([convertedBlob], file.name.replace(/\.[^/.]+$/, ".jpg"), { type: 'image/jpeg' });
         }
     }
 }
@@ -46,7 +75,8 @@ async function processFiles() {
 async function displayPhoto(index) {
     if (index < 0 || index >= files.length) return;
 
-    const file = files[index];
+    const fileHandle = files[index];
+    const file = fileHandle instanceof File ? fileHandle : await fileHandle.getFile();
     const reader = new FileReader();
     reader.onload = (e) => {
         photoContainer.innerHTML = '';
@@ -73,7 +103,7 @@ async function displayPhoto(index) {
             if (change > 100) {
                 card.classList.add('keep');
                 card.textContent = 'Kept';
-                updatePhotoGroup(file.name, 'kept', URL.createObjectURL(file));
+                updatePhotoGroup(fileHandle.name, 'kept', URL.createObjectURL(file));
                 setTimeout(() => {
                     if (currentCardIndex < files.length - 1) {
                         currentCardIndex++;
@@ -88,7 +118,7 @@ async function displayPhoto(index) {
             } else if (change < -100) {
                 card.classList.add('delete');
                 card.textContent = 'Deleted';
-                updatePhotoGroup(file.name, 'deleted', URL.createObjectURL(file));
+                updatePhotoGroup(fileHandle.name, 'deleted', URL.createObjectURL(file));
                 setTimeout(() => {
                     if (currentCardIndex < files.length - 1) {
                         currentCardIndex++;
@@ -216,12 +246,15 @@ viewResultsButton.addEventListener('click', () => {
 });
 
 commitChangesButton.addEventListener('click', async () => {
-    for (const photo of deletedPhotos) {
-        // Note: Deleting files is not supported in the browser environment.
-        // This is a placeholder for server-side deletion logic.
-        console.log(`Deleting photo: ${photo.name}`);
+    if (!isMobileDevice()) {
+        for (const photo of deletedPhotos) {
+            await directoryHandle.removeEntry(photo.name);
+        }
+        alert('Deleted photos have been removed.');
+    } else {
+        const deletedFileNames = deletedPhotos.map(photo => photo.name).join('\n');
+        alert(`Please manually delete the following files from your device:\n\n${deletedFileNames}`);
     }
-    alert('Deleted photos have been removed.');
     resultsContainer.style.display = 'none';
     photoContainer.style.display = 'flex';
 });
