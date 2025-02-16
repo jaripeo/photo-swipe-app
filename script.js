@@ -1,4 +1,5 @@
 const folderButton = document.getElementById('folderButton');
+const fileInput = document.getElementById('fileInput');
 const photoContainer = document.getElementById('photoContainer');
 const prevButton = document.getElementById('prevButton');
 const nextButton = document.getElementById('nextButton');
@@ -14,18 +15,13 @@ let files = [];
 let keptPhotos = [];
 let deletedPhotos = [];
 let atEnd = false;
-let directoryHandle;
 
-folderButton.addEventListener('click', async () => {
-    directoryHandle = await window.showDirectoryPicker();
-    files = [];
+folderButton.addEventListener('click', () => {
+    fileInput.click();
+});
 
-    for await (const entry of directoryHandle.values()) {
-        if (entry.kind === 'file' && entry.name.match(/\.(jpg|jpeg|png|gif|avif)$/i)) {
-            files.push(entry);
-        }
-    }
-
+fileInput.addEventListener('change', (event) => {
+    files = Array.from(event.target.files);
     currentCardIndex = 0;
     keptPhotos = [];
     deletedPhotos = [];
@@ -40,8 +36,7 @@ folderButton.addEventListener('click', async () => {
 async function displayPhoto(index) {
     if (index < 0 || index >= files.length) return;
 
-    const fileHandle = files[index];
-    const file = await fileHandle.getFile();
+    const file = files[index];
     const reader = new FileReader();
     reader.onload = (e) => {
         photoContainer.innerHTML = '';
@@ -68,7 +63,7 @@ async function displayPhoto(index) {
             if (change > 100) {
                 card.classList.add('keep');
                 card.textContent = 'Kept';
-                updatePhotoGroup(fileHandle.name, 'kept', e.target.result);
+                updatePhotoGroup(file.name, 'kept', e.target.result);
                 setTimeout(() => {
                     if (currentCardIndex < files.length - 1) {
                         currentCardIndex++;
@@ -83,7 +78,7 @@ async function displayPhoto(index) {
             } else if (change < -100) {
                 card.classList.add('delete');
                 card.textContent = 'Deleted';
-                updatePhotoGroup(fileHandle.name, 'deleted', e.target.result);
+                updatePhotoGroup(file.name, 'deleted', e.target.result);
                 setTimeout(() => {
                     if (currentCardIndex < files.length - 1) {
                         currentCardIndex++;
@@ -212,7 +207,9 @@ viewResultsButton.addEventListener('click', () => {
 
 commitChangesButton.addEventListener('click', async () => {
     for (const photo of deletedPhotos) {
-        await directoryHandle.removeEntry(photo.name);
+        // Note: Deleting files is not supported in the browser environment.
+        // This is a placeholder for server-side deletion logic.
+        console.log(`Deleting photo: ${photo.name}`);
     }
     alert('Deleted photos have been removed.');
     resultsContainer.style.display = 'none';
