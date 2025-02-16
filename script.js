@@ -20,11 +20,12 @@ folderButton.addEventListener('click', () => {
     fileInput.click();
 });
 
-fileInput.addEventListener('change', (event) => {
+fileInput.addEventListener('change', async (event) => {
     files = Array.from(event.target.files);
     currentCardIndex = 0;
     keptPhotos = [];
     deletedPhotos = [];
+    await processFiles();
     displayPhoto(currentCardIndex);
     updatePhotoIndex();
     endMessage.style.display = 'none';
@@ -32,6 +33,15 @@ fileInput.addEventListener('change', (event) => {
     photoContainer.style.display = 'flex';
     atEnd = false;
 });
+
+async function processFiles() {
+    for (let i = 0; i < files.length; i++) {
+        if (files[i].type === 'image/heif' || files[i].type === 'image/heic') {
+            const convertedBlob = await heic2any({ blob: files[i], toType: 'image/jpeg' });
+            files[i] = new File([convertedBlob], files[i].name.replace(/\.[^/.]+$/, ".jpg"), { type: 'image/jpeg' });
+        }
+    }
+}
 
 async function displayPhoto(index) {
     if (index < 0 || index >= files.length) return;
